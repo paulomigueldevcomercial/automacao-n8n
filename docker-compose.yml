@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=senha123
+      - N8N_HOST=automacoes.serenavibe.com.br
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://automacoes.serenavibe.com.br/
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+    volumes:
+      - ./n8n_data:/home/node/.n8n
