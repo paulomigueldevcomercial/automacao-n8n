@@ -1,0 +1,63 @@
+{
+    "name": "WhatsApp Cloud API - Enviar mensagem (teste)",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual_trigger",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [300, 300]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              { "name": "phone_number_id", "value": "SEU_PHONE_NUMBER_ID" },
+              { "name": "token", "value": "SEU_ACCESS_TOKEN" },
+              { "name": "to", "value": "5511999999999" },
+              { "name": "text", "value": "Olá! Teste via n8n + WhatsApp Cloud API" }
+            ]
+          },
+          "options": {}
+        },
+        "id": "set_vars",
+        "name": "Set Vars",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [520, 300]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://graph.facebook.com/v20.0/{{$json.phone_number_id}}/messages",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              { "name": "Authorization", "value": "Bearer {{$json.token}}" },
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{$json.to}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json.text}}\"\n  }\n}"
+        },
+        "id": "http_request",
+        "name": "Send WhatsApp Message",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [780, 300]
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [[{ "node": "Set Vars", "type": "main", "index": 0 }]]
+      },
+      "Set Vars": {
+        "main": [[{ "node": "Send WhatsApp Message", "type": "main", "index": 0 }]]
+      }
+    },
+    "active": false,
+    "versionId": "1"
+  }
+  

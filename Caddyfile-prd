@@ -1,0 +1,12 @@
+{
+    email contato@serenavibe.com.br
+}
+
+www.automacoes.serenavibe.com.br {
+    redir https://automacoes.serenavibe.com.br{uri}
+}
+
+automacoes.serenavibe.com.br {
+    encode gzip
+    reverse_proxy n8n:5678
+}
