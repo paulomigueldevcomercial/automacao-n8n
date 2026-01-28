@@ -1,0 +1,113 @@
+{
+  "name": "Chatwoot - Criar conversa e enviar mensagem (exemplo)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual_trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            { "name": "chatwoot_base_url", "value": "https://chatwoot.seudominio.com" },
+            { "name": "chatwoot_token", "value": "SEU_ACCESS_TOKEN" },
+            { "name": "account_id", "value": "1" },
+            { "name": "inbox_id", "value": "1" },
+            { "name": "contact_email", "value": "cliente@exemplo.com" },
+            { "name": "contact_name", "value": "Cliente Exemplo" },
+            { "name": "mensagem", "value": "Olá! Mensagem enviada via n8n." }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set_vars",
+      "name": "Set Vars",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set Vars\"].json.chatwoot_base_url}}/api/v1/accounts/{{$node[\"Set Vars\"].json.account_id}}/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api_access_token", "value": "={{$node[\"Set Vars\"].json.chatwoot_token}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{$node[\\\"Set Vars\\\"].json.contact_name}}\",\n  \"email\": \"{{$node[\\\"Set Vars\\\"].json.contact_email}}\"\n}"
+      },
+      "id": "create_contact",
+      "name": "Create Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set Vars\"].json.chatwoot_base_url}}/api/v1/accounts/{{$node[\"Set Vars\"].json.account_id}}/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api_access_token", "value": "={{$node[\"Set Vars\"].json.chatwoot_token}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_id\": \"{{$node[\\\"Set Vars\\\"].json.contact_email}}\",\n  \"inbox_id\": {{$node[\\\"Set Vars\\\"].json.inbox_id}},\n  \"contact_id\": {{$json.id}}\n}"
+      },
+      "id": "create_conversation",
+      "name": "Create Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set Vars\"].json.chatwoot_base_url}}/api/v1/accounts/{{$node[\"Set Vars\"].json.account_id}}/conversations/{{$json.id}}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api_access_token", "value": "={{$node[\"Set Vars\"].json.chatwoot_token}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{$node[\\\"Set Vars\\\"].json.mensagem}}\",\n  \"message_type\": \"outgoing\"\n}"
+      },
+      "id": "send_message",
+      "name": "Send Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1180, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Set Vars", "type": "main", "index": 0 }]]
+    },
+    "Set Vars": {
+      "main": [[{ "node": "Create Contact", "type": "main", "index": 0 }]]
+    },
+    "Create Contact": {
+      "main": [[{ "node": "Create Conversation", "type": "main", "index": 0 }]]
+    },
+    "Create Conversation": {
+      "main": [[{ "node": "Send Message", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "versionId": "1"
+}

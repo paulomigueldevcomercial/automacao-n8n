@@ -29,3 +29,78 @@ services:
       - GENERIC_TIMEZONE=America/Sao_Paulo
     volumes:
       - ./n8n_data:/home/node/.n8n
+
+  chatwoot-redis:
+    image: redis:7-alpine
+    container_name: chatwoot-redis
+    restart: always
+    volumes:
+      - ./chatwoot_redis_data:/data
+
+  chatwoot-postgres:
+    image: postgres:15-alpine
+    container_name: chatwoot-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=chatwoot
+      - POSTGRES_USER=chatwoot
+      - POSTGRES_PASSWORD=chatwoot
+    volumes:
+      - ./chatwoot_postgres_data:/var/lib/postgresql/data
+
+  chatwoot:
+    image: chatwoot/chatwoot:latest
+    container_name: chatwoot
+    restart: always
+    depends_on:
+      - chatwoot-postgres
+      - chatwoot-redis
+    environment:
+      - RAILS_ENV=production
+      - NODE_ENV=production
+      - INSTALLATION_ENV=docker
+      - SECRET_KEY_BASE=coloque_uma_chave_segura_aqui
+      - FRONTEND_URL=https://chatwoot.local
+      - FORCE_SSL=true
+      - ENABLE_ACCOUNT_SIGNUP=false
+      - REDIS_URL=redis://chatwoot-redis:6379
+      - POSTGRES_HOST=chatwoot-postgres
+      - POSTGRES_USERNAME=chatwoot
+      - POSTGRES_PASSWORD=chatwoot
+      - POSTGRES_DATABASE=chatwoot
+      - MAILER_SENDER_EMAIL=Chatwoot <contato@exemplo.com>
+      - SMTP_ADDRESS=smtp.exemplo.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=usuario
+      - SMTP_PASSWORD=senha
+      - SMTP_DOMAIN=exemplo.com
+      - SMTP_AUTHENTICATION=login
+      - SMTP_ENABLE_STARTTLS_AUTO=true
+    volumes:
+      - ./chatwoot_data:/app/storage
+      - ./certs/chatwoot:/certs:ro
+    ports:
+      - "3001:3000"
+    command: ["bash", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -b 0.0.0.0 -p 3000"]
+
+  chatwoot-worker:
+    image: chatwoot/chatwoot:latest
+    container_name: chatwoot-worker
+    restart: always
+    depends_on:
+      - chatwoot-postgres
+      - chatwoot-redis
+    environment:
+      - RAILS_ENV=production
+      - NODE_ENV=production
+      - INSTALLATION_ENV=docker
+      - SECRET_KEY_BASE=coloque_uma_chave_segura_aqui
+      - REDIS_URL=redis://chatwoot-redis:6379
+      - POSTGRES_HOST=chatwoot-postgres
+      - POSTGRES_USERNAME=chatwoot
+      - POSTGRES_PASSWORD=chatwoot
+      - POSTGRES_DATABASE=chatwoot
+    volumes:
+      - ./chatwoot_data:/app/storage
+      - ./certs/chatwoot:/certs:ro
+    command: ["bash", "-c", "bundle exec sidekiq -C config/sidekiq.yml"]
