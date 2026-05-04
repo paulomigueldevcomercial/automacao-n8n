@@ -21,14 +21,22 @@ services:
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=senha123
 
-      - N8N_HOST=localhost
+      - N8N_HOST=automacoes.serenavibe.com.br
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:8083/
+      - WEBHOOK_URL=http://automacoes.serenavibe.com.br/
 
       - GENERIC_TIMEZONE=America/Sao_Paulo
     volumes:
       - ./n8n_data:/home/node/.n8n
+    expose:
+      - "5678"
+    networks:
+      default:
+      automacao_proxy:
+        aliases:
+          - n8n
+          - automacao-n8n
 
   chatwoot-redis:
     image: redis:7-alpine
@@ -104,3 +112,8 @@ services:
       - ./chatwoot_data:/app/storage
       - ./certs/chatwoot:/certs:ro
     command: ["bash", "-c", "bundle exec sidekiq -C config/sidekiq.yml"]
+
+networks:
+  automacao_proxy:
+    external: true
+    name: ${AUTOMACAO_PROXY_NETWORK:-goldeplaca_proxy}

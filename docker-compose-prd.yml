@@ -28,3 +28,16 @@ services:
       - GENERIC_TIMEZONE=America/Sao_Paulo
     volumes:
       - ./n8n_data:/home/node/.n8n
+    expose:
+      - "5678"
+    networks:
+      default:
+      automacao_proxy:
+        aliases:
+          - n8n
+          - automacao-n8n
+
+networks:
+  automacao_proxy:
+    external: true
+    name: ${AUTOMACAO_PROXY_NETWORK:-goldeplaca_proxy}
