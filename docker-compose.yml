@@ -94,7 +94,7 @@ services:
       automacao_proxy:
         aliases:
           - chatwoot
-    command: ["bash", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -b 0.0.0.0 -p 3000"]
+    command: ["sh", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -b 0.0.0.0 -p 3000"]
 
   chatwoot-worker:
     image: chatwoot/chatwoot:latest
@@ -116,7 +116,7 @@ services:
     volumes:
       - ./chatwoot_data:/app/storage
       - ./certs/chatwoot:/certs:ro
-    command: ["bash", "-c", "bundle exec sidekiq -C config/sidekiq.yml"]
+    command: ["sh", "-c", "bundle exec sidekiq -C config/sidekiq.yml"]
 
 networks:
   automacao_proxy:
