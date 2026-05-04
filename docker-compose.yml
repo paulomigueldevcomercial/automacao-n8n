@@ -26,8 +26,9 @@ services:
 
       - N8N_HOST=automacoes.serenavibe.com.br
       - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://automacoes.serenavibe.com.br/
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://automacoes.serenavibe.com.br/
+      - N8N_EDITOR_BASE_URL=https://automacoes.serenavibe.com.br/
 
       - GENERIC_TIMEZONE=America/Sao_Paulo
     volumes:
@@ -79,8 +80,8 @@ services:
       - NODE_ENV=production
       - INSTALLATION_ENV=docker
       - SECRET_KEY_BASE=coloque_uma_chave_segura_aqui
-      - FRONTEND_URL=http://chatwoot.serenavibe.com.br
-      - FORCE_SSL=false
+      - FRONTEND_URL=https://chatwoot.serenavibe.com.br
+      - FORCE_SSL=true
       - ENABLE_ACCOUNT_SIGNUP=false
       - REDIS_URL=redis://chatwoot-redis:6379
       - POSTGRES_HOST=chatwoot-postgres
