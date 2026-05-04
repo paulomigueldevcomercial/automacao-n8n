@@ -58,7 +58,7 @@ services:
       - ./chatwoot_redis_data:/data
 
   chatwoot-postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     container_name: chatwoot-postgres
     restart: always
     environment:
