@@ -20,4 +20,5 @@ if ! docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
 fi
 
 cd "$PROJECT_DIR"
+"${COMPOSE[@]}" run --rm n8n-permissions
 "${COMPOSE[@]}" up -d n8n chatwoot chatwoot-worker

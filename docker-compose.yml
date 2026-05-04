@@ -16,6 +16,9 @@ services:
     image: n8nio/n8n:latest
     container_name: n8n
     restart: always
+    depends_on:
+      n8n-permissions:
+        condition: service_completed_successfully
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
@@ -37,6 +40,14 @@ services:
         aliases:
           - n8n
           - automacao-n8n
+
+  n8n-permissions:
+    image: alpine:3.20
+    container_name: n8n-permissions
+    restart: "no"
+    command: ["sh", "-c", "mkdir -p /data && chown -R 1000:1000 /data"]
+    volumes:
+      - ./n8n_data:/data
 
   chatwoot-redis:
     image: redis:7-alpine
