@@ -20,4 +20,4 @@ if ! docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
 fi
 
 cd "$PROJECT_DIR"
-"${COMPOSE[@]}" up -d n8n
+"${COMPOSE[@]}" up -d n8n chatwoot chatwoot-worker
